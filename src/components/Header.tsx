@@ -1,25 +1,29 @@
 import Link from "next/link";
 import { Category, CategoryProps } from "./Category";
 import styles from "./Header.module.css";
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useState } from "react";
 import React from "react";
+import { useRouter } from "next/router";
+import { useQuery } from "@apollo/client";
+import { GET_CATEGORIES } from "@/graphql/queryCategories";
 
 export const Header = (): React.ReactNode => {
-  const [categories, setCategories] = useState<CategoryProps[]>([]);
+  const [searchWord, setSearchWord] = useState("");
+  const router = useRouter();
 
-  async function fetchCategories() {
-    await axios
-      .get<CategoryProps[]>("http://localhost:5001/categories")
-      .then((res) => setCategories(res.data))
-      .catch((err) => {
-        console.error(err);
-      });
+  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    router.push(`/ads?searchWord=${searchWord.trim()}`);
   }
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
+  const { data, error, loading } = useQuery<{ getCategories: CategoryProps[] }>(
+    GET_CATEGORIES
+  );
+
+  const categories = data?.getCategories || [];
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error :</p>;
 
   return (
     <header className={styles.header}>
@@ -35,12 +39,14 @@ export const Header = (): React.ReactNode => {
             </span>
           </Link>
         </h1>
-        <form className={styles["text-field-with-button"]}>
+        <form className={styles["text-field-with-button"]} onSubmit={onSubmit}>
           <input
             className={`${styles["text-field"]} ${styles["main-search-field"]}`}
             type="search"
+            value={searchWord}
+            onChange={(e) => setSearchWord(e.target.value)}
           />
-          <button className={styles["button-primary"]}>
+          <button className={styles["button-primary"]} type="submit">
             <svg
               aria-hidden="true"
               width="16"

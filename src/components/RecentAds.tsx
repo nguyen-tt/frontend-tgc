@@ -1,29 +1,40 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AdCard, AdCardProps } from "./AdCard";
 import styles from "./RecentAds.module.css";
-import axios from "axios";
+import { useQuery } from "@apollo/client";
+import { GET_ADS } from "@/graphql/queryAds";
 
-export const RecentAds = (category: number) => {
+type RecentAdsProps = {
+  categoryId?: number;
+  searchWord?: string;
+};
+
+export const RecentAds = ({
+  categoryId,
+  searchWord,
+}: RecentAdsProps): React.ReactNode => {
   const [total, setTotal] = useState(0);
-  const [ads, setAds] = useState<AdCardProps[]>([]);
 
   const addPriceToTotal = (price: number) => {
     setTotal(total + price);
   };
 
-  async function fetchAds() {
-    let url = `http://localhost:5001/ads?`;
-    if (category) {
-      url += `categoryIn=${category}`;
+  const { data, error, loading } = useQuery<{ getAds: AdCardProps[] }>(
+    GET_ADS,
+    {
+      variables: {
+        where: {
+          ...(categoryId ? { categoryIn: categoryId } : {}),
+          ...(searchWord ? { searchTitle: searchWord } : {}),
+        },
+      },
     }
-    const res = await axios.get(url);
-    setAds(res.data);
-  }
+  );
 
-  useEffect(() => {
-    fetchAds();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [category]);
+  const ads = data?.getAds || [];
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error :</p>;
 
   return (
     <>
@@ -38,14 +49,13 @@ export const RecentAds = (category: number) => {
               link={`/ads/${ad.id}`}
               price={ad.price}
               title={ad.title}
-              onDelete={fetchAds}
+              description={ad.description}
+              owner={ad.owner}
+              location={ad.location}
+              category={ad.category}
+              onAddPriceToTotal={() => addPriceToTotal(ad.price)}
+              // tags={ad.tags}
             />
-            <button
-              className="button"
-              onClick={() => addPriceToTotal(ad.price)}
-            >
-              Add price to total
-            </button>
           </div>
         ))}
       </section>

@@ -15,11 +15,13 @@
   border-radius: 8px;
 }
 
-.ad-card-text {
+.ad-card-content {
+  display: flex;
+  flex-direction: column;
   padding: 12px;
   font-size: 18px;
   display: flex;
-  justify-content: space-between;
+  align-items: center;
 }
 
 .ad-card-title {

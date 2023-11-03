@@ -1,3 +1,4 @@
+import Link from "next/link";
 import styles from "./Category.module.css";
 
 export type CategoryType = {
@@ -10,12 +11,12 @@ export type CategoryProps = CategoryType;
 export const Category = ({ name, id }: CategoryProps) => {
   return (
     <div>
-      <a
+      <Link
         href={`/categories/${id}`}
         className={styles["category-navigation-link"]}
       >
         {name}
-      </a>
+      </Link>
     </div>
   );
 };
