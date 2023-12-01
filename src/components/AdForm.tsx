@@ -119,9 +119,10 @@ export const AdForm = ({ ad }: AdFormProps) => {
       setPicture(ad.picture);
       setLocation(ad.location);
       setCategory(ad.category?.id ? { id: ad.category.id } : undefined);
+      setCategory(ad.category ? ad.category.id : categories[0]?.id);
       setTags(ad.tags);
     }
-  }, [ad]);
+  }, [ad, categories]);
 
   return (
     <form onSubmit={onSubmit} className={styles.form}>

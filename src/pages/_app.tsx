@@ -9,7 +9,7 @@ import type { AppProps } from "next/app";
 import dynamic from "next/dynamic";
 
 const client = new ApolloClient({
-  uri: "http://localhost:5001",
+  uri: "http://localhost:5555",
   cache: new InMemoryCache(),
 });
 

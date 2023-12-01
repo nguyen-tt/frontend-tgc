@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const GET_ADS = gql`
-  query GetAds($where: AdsWhere) {
-    getAds(where: $where) {
+  query GetAds($skip: Int, $take: Int, $where: AdsWhere) {
+    getAds(skip: $skip, take: $take, where: $where) {
       id
       title
       owner
@@ -20,5 +20,6 @@ export const GET_ADS = gql`
         name
       }
     }
+    allAdsCount(where: $where)
   }
 `;
