@@ -1,11 +1,14 @@
 import Link from "next/link";
-import { Category, CategoryProps } from "./Category";
+import {Category, CategoryProps} from "./Category";
 import styles from "./Header.module.css";
-import { useState } from "react";
+import {useState} from "react";
 import React from "react";
-import { useRouter } from "next/router";
-import { useQuery } from "@apollo/client";
-import { GET_CATEGORIES } from "@/graphql/queryCategories";
+import {useRouter} from "next/router";
+import {useApolloClient, useMutation, useQuery} from "@apollo/client";
+import {GET_CATEGORIES} from "@/graphql/queryCategories";
+import {UserType} from "@/types";
+import {queryMe} from "@/graphql/queryMe";
+import {mutationSignout} from "@/graphql/mutationSignout";
 
 export const Header = (): React.ReactNode => {
   const [searchWord, setSearchWord] = useState("");
@@ -16,11 +19,23 @@ export const Header = (): React.ReactNode => {
     router.push(`/ads?searchWord=${searchWord.trim()}`);
   }
 
-  const { data, error, loading } = useQuery<{ getCategories: CategoryProps[] }>(
+  const {data, error, loading} = useQuery<{getCategories: CategoryProps[]}>(
     GET_CATEGORIES
   );
 
   const categories = data?.getCategories || [];
+
+  const {data: meData} = useQuery<{item: UserType | null}>(queryMe);
+  const me = meData?.item;
+
+  const [doSignout] = useMutation(mutationSignout, {
+    refetchQueries: [queryMe],
+  });
+  const apolloClient = useApolloClient();
+  async function logout() {
+    apolloClient.clearStore();
+    doSignout();
+  }
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error :</p>;
@@ -62,6 +77,12 @@ export const Header = (): React.ReactNode => {
             </svg>
           </button>
         </form>
+        {me && (
+          <button onClick={logout} className="button link-button">
+            <span className="mobile-short-label">Déco</span>
+            <span className="desktop-long-label">Déconnexion</span>
+          </button>
+        )}
         <Link
           href="/ads/new"
           className={`${styles.button} ${styles["link-button"]}`}

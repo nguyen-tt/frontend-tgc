@@ -1,4 +1,4 @@
-import { Header } from "@/components/Header";
+import {Header} from "@/components/Header";
 import Head from "next/head";
 import styles from "./Layout.module.css";
 
@@ -7,7 +7,7 @@ type LayoutProps = {
   title: string;
 };
 
-export default function Layout({ children, title }: LayoutProps) {
+export default function Layout({children, title}: LayoutProps) {
   return (
     <>
       <Head>
